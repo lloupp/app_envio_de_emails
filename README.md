@@ -1,57 +1,70 @@
-Alfredo do Email
-O Alfredo do Email é uma ferramenta de automação desenvolvida com Python e Streamlit para facilitar o envio de e-mails em massa através do Microsoft Outlook. Ele permite a personalização dinâmica do corpo do e-mail e do assunto utilizando colunas de uma planilha Excel ou CSV, além de anexar arquivos automaticamente.
+# ✉️ Alfredo do Email
 
-✨ Funcionalidades
-Upload de Planilha: Suporte para arquivos .xlsx e .csv.
+O **Alfredo do Email** é uma ferramenta de automação desenvolvida com Python e Streamlit para facilitar o envio de e-mails em massa através do Microsoft Outlook. Ele permite a personalização dinâmica do corpo e do assunto do e-mail utilizando colunas de uma planilha Excel ou CSV, além de anexar arquivos automaticamente.
 
-Mapeamento Dinâmico: Escolha quais colunas representam o destinatário, cópia (CC), cópia oculta (BCC) e o nome do anexo.
+---
 
-Editor de Texto Rico: Utilize o componente streamlit-quill para formatar seu e-mail com negrito, listas e links.
+## ✨ Funcionalidades
 
-Tags Personalizadas: Use {NomeDaColuna} no assunto ou no corpo para personalizar cada mensagem.
+- **Upload de Planilha:** Suporte para arquivos `.xlsx` e `.csv`.
+- **Mapeamento Dinâmico:** Escolha quais colunas representam o destinatário, cópia (CC), cópia oculta (CCO) e o nome do anexo.
+- **Editor de Texto Rico:** Utilize o componente `streamlit-quill` para formatar seu e-mail com negrito, listas e links.
+- **Tags Personalizadas:** Use `{NomeDaColuna}` no assunto ou no corpo para personalizar cada mensagem.
+- **Integração com Outlook:** Os e-mails são gerados diretamente como rascunhos no Outlook, preservando sua assinatura padrão.
+- **Modo Teste:** Gere apenas o primeiro rascunho para validar a formatação antes de processar toda a lista.
 
-Integração com Outlook: Os e-mails são gerados diretamente como rascunhos no Outlook, preservando sua assinatura padrão.
+---
 
-Modo Teste: Gere apenas o primeiro registro para validar a formatação antes de processar toda a lista.
+## 🛠️ Pré-requisitos
 
-🛠️ Pré-requisitos
-Para rodar este projeto, você precisará de:
+- **Sistema Operacional:** Windows (necessário para a integração com `win32com`).
+- **Microsoft Outlook** instalado e configurado com uma conta ativa.
+- **Python 3.8+** instalado.
 
-Sistema Operacional: Windows (necessário para a integração com win32com).
+---
 
-Microsoft Outlook: Instalado e configurado com uma conta ativa.
+## 🚀 Como instalar e rodar
 
-Python 3.8+ instalado.
+**1. Clone o repositório:**
 
-🚀 Como instalar e rodar
-Clone o repositório:
+```bash
+git clone https://github.com/lloupp/app_envio_de_emails.git
+cd app_envio_de_emails
+```
 
-Bash
-git clone https://github.com/SEU_USUARIO/alfredo-do-email.git
-cd alfredo-do-email
-Crie um ambiente virtual (recomendado):
+**2. Crie um ambiente virtual (recomendado):**
 
-Bash
+```bash
 python -m venv venv
 venv\Scripts\activate
-Instale as dependências:
+```
 
-Bash
-pip install streamlit pandas pywin32 streamlit-quill
-Execute a aplicação:
+**3. Instale as dependências:**
 
-Bash
-streamlit run seu_arquivo.py
-📖 Como usar
-Prepare sua planilha: Certifique-se de que ela tenha colunas para o e-mail e, se necessário, uma coluna com o nome exato dos arquivos de anexo (ex: documento_01.pdf).
+```bash
+pip install -r requirements.txt
+```
 
-Configure os Anexos: Na barra lateral, cole o caminho da pasta onde os arquivos estão salvos no seu computador.
+**4. Execute a aplicação:**
 
-Redija o E-mail: Use o formato {Coluna} para inserir dados da planilha. Exemplo: Olá {Nome}, segue seu boleto.
+```bash
+streamlit run gerador_email.py
+```
 
-Gere os Rascunhos: Clique em "Gerar Todos". O Alfredo abrirá o Outlook em segundo plano e salvará os e-mails na sua pasta de Rascunhos.
+---
 
-📝 Observações Técnicas
-O script utiliza pythoncom.CoInitialize() para garantir a estabilidade da conexão com a API do Windows.
+## 📖 Como usar
 
-O uso de mail.Display() seguido de mail.Save() é proposital para garantir que a assinatura padrão do seu Outlook seja carregada no corpo do e-mail.
+1. **Prepare sua planilha:** Certifique-se de que ela tenha uma coluna com os e-mails dos destinatários e, se necessário, uma coluna com o nome exato dos arquivos de anexo (ex: `documento_01.pdf`).
+2. **Configure os Anexos:** Na barra lateral, cole o caminho completo da pasta onde os arquivos estão salvos (ex: `C:\Documentos\Certificados`).
+3. **Redija o E-mail:** Use o formato `{NomeDaColuna}` para inserir dados da planilha. Exemplo: `Olá {Nome}, segue seu boleto.`
+4. **Gere os Rascunhos:** Clique em **"Gerar Todos"**. O Alfredo abrirá o Outlook em segundo plano e salvará os e-mails na sua pasta de Rascunhos.
+
+---
+
+## 📝 Observações Técnicas
+
+- O script utiliza `pythoncom.CoInitialize()` para garantir a estabilidade da conexão com a API do Windows, e `pythoncom.CoUninitialize()` ao finalizar.
+- O uso de `mail.Display()` seguido de `mail.Save()` é proposital: garante que a assinatura padrão do Outlook seja carregada no corpo do e-mail.
+- Caso algum arquivo de anexo não seja encontrado, o rascunho ainda é criado e os arquivos faltantes são listados ao final do processamento.
+
