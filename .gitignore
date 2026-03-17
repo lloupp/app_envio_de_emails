@@ -6,3 +6,9 @@ __pycache__/
 .vscode/
 *.xlsx
 *.csv
+*.log
+.DS_Store
+*.pyc
+dist/
+build/
+*.egg-info/
