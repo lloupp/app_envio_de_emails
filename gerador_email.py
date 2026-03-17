@@ -19,22 +19,22 @@ with st.expander("📖 MANUAL: Como selecionar a pasta de anexos"):
 
 st.title("✉️ Alfredo do email")
 
-# --- SIDEBAR ---
+# --- BARRA LATERAL ---
 with st.sidebar:
     st.header("1. Configurações")
-    uploaded_file = st.file_uploader("Suba sua Planilha", type=["xlsx", "csv"])
+    arquivo_carregado = st.file_uploader("Suba sua Planilha", type=["xlsx", "csv"])
 
     # Campo de texto para o caminho da pasta (Substitui o buscador de pastas)
     caminho_input = st.text_input("Caminho da pasta de anexos (Copie e cole aqui)")
     caminho_anexos = caminho_input.replace('"', '').strip()  # Limpeza de aspas
 
-if uploaded_file:
-    if uploaded_file.name.endswith('xlsx'):
-        excel_file = pd.ExcelFile(uploaded_file)
-        aba = st.selectbox("Selecione a Aba", excel_file.sheet_names)
-        df = pd.read_excel(uploaded_file, sheet_name=aba)
+if arquivo_carregado:
+    if arquivo_carregado.name.endswith('xlsx'):
+        arquivo_excel = pd.ExcelFile(arquivo_carregado)
+        aba = st.selectbox("Selecione a Aba", arquivo_excel.sheet_names)
+        df = pd.read_excel(arquivo_carregado, sheet_name=aba)
     else:
-        df = pd.read_csv(uploaded_file)
+        df = pd.read_csv(arquivo_carregado)
 
     st.write("### 📋 Dados Identificados", df.head(3))
     colunas = df.columns.tolist()
@@ -52,9 +52,9 @@ if uploaded_file:
     st.divider()
 
     st.subheader("📝 Redigir Mensagem")
-    subject = st.text_input("Assunto do E-mail")
+    assunto = st.text_input("Assunto do E-mail")
 
-    content = st_quill(
+    conteudo = st_quill(
         placeholder="Escreva seu e-mail aqui... use {Tags} para personalizar.",
         html=True,
         key="quill_editor"
@@ -68,7 +68,7 @@ if uploaded_file:
         btn_massa = st.button("🚀 Gerar TODOS", type="primary", use_container_width=True)
 
     if btn_teste or btn_massa:
-        df_proc = df.head(1) if btn_teste else df
+        df_processado = df.head(1) if btn_teste else df
 
         try:
             pythoncom.CoInitialize()
@@ -79,55 +79,55 @@ if uploaded_file:
 
             sucesso = 0
             erros_anexo = []
-            progress = st.progress(0)
+            barra_progresso = st.progress(0)
 
-            for index, row in df_proc.iterrows():
-                email_dest = str(row[col_email]).strip()
-                if "@" not in email_dest: continue
+            for indice, linha in df_processado.iterrows():
+                destinatario = str(linha[col_email]).strip()
+                if "@" not in destinatario: continue
 
-                mail = outlook.CreateItem(0)
-                mail.Display()  # Abre para carregar a assinatura
+                rascunho = outlook.CreateItem(0)
+                rascunho.Display()  # Abre para carregar a assinatura
 
                 # Preenchimento de destinatários (Garante que apareçam no Outlook)
-                mail.To = email_dest
-                if col_cc and pd.notna(row[col_cc]):
-                    mail.CC = str(row[col_cc]).strip()
-                if col_bcc and pd.notna(row[col_bcc]):
-                    mail.BCC = str(row[col_bcc]).strip()
+                rascunho.To = destinatario
+                if col_cc and pd.notna(linha[col_cc]):
+                    rascunho.CC = str(linha[col_cc]).strip()
+                if col_bcc and pd.notna(linha[col_bcc]):
+                    rascunho.BCC = str(linha[col_bcc]).strip()
 
                 # Substituição de Tags
-                assunto_f = subject
-                corpo_f = content
+                assunto_formatado = assunto
+                corpo_formatado = conteudo
                 for col in colunas:
-                    tag = "{" + col + "}"
-                    val = str(row[col]) if pd.notna(row[col]) else ""
-                    assunto_f = assunto_f.replace(tag, val)
-                    corpo_f = corpo_f.replace(tag, val)
+                    marcador = "{" + col + "}"
+                    valor = str(linha[col]) if pd.notna(linha[col]) else ""
+                    assunto_formatado = assunto_formatado.replace(marcador, valor)
+                    corpo_formatado = corpo_formatado.replace(marcador, valor)
 
-                mail.Subject = assunto_f
-                mail.HTMLBody = f"<div style='font-family: Calibri; font-size: 11pt;'>{corpo_f}</div><br>" + mail.HTMLBody
+                rascunho.Subject = assunto_formatado
+                rascunho.HTMLBody = f"<div style='font-family: Calibri; font-size: 11pt;'>{corpo_formatado}</div><br>" + rascunho.HTMLBody
 
                 # Lógica de Anexo corrigida
-                if caminho_anexos and col_arq and pd.notna(row[col_arq]):
-                    nome_arquivo = str(row[col_arq]).strip()
-                    arq_path = os.path.join(caminho_anexos, nome_arquivo)
+                if caminho_anexos and col_arq and pd.notna(linha[col_arq]):
+                    nome_arquivo = str(linha[col_arq]).strip()
+                    caminho_arquivo = os.path.join(caminho_anexos, nome_arquivo)
 
-                    if os.path.exists(arq_path):
-                        mail.Attachments.Add(os.path.abspath(arq_path))
+                    if os.path.exists(caminho_arquivo):
+                        rascunho.Attachments.Add(os.path.abspath(caminho_arquivo))
                     else:
                         erros_anexo.append(f"Arquivo não encontrado: {nome_arquivo}")
 
-                mail.Save()
-                mail.Close(0)
+                rascunho.Save()
+                rascunho.Close(0)
                 sucesso += 1
-                progress.progress((index + 1) / len(df_proc))
+                barra_progresso.progress((indice + 1) / len(df_processado))
 
             st.success(f"✅ Finalizado! {sucesso} rascunhos criados no Outlook.")
             if erros_anexo:
                 with st.expander("⚠️ Ver arquivos não localizados"):
-                    for err in erros_anexo: st.warning(err)
+                    for mensagem_erro in erros_anexo: st.warning(mensagem_erro)
 
-        except Exception as e:
-            st.error(f"Erro no processamento: {e}")
+        except Exception as erro:
+            st.error(f"Erro no processamento: {erro}")
 else:
     st.info("Aguardando planilha...")
