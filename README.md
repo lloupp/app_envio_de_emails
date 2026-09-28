@@ -6,7 +6,7 @@ Upload de Planilha: Suporte para arquivos .xlsx e .csv.
 
 Mapeamento Dinâmico: Escolha quais colunas representam o destinatário, cópia (CC), cópia oculta (BCC) e o nome do anexo.
 
-Editor de Texto Rico: Utilize o componente streamlit-quill para formatar seu e-mail com negrito, listas e links.
+Editor de Texto Avançado: Utilize o componente streamlit-editorjs para formatar seu e-mail com blocos, imagens, listas, tabelas e links.
 
 Tags Personalizadas: Use {NomeDaColuna} no assunto ou no corpo para personalizar cada mensagem.
 
@@ -31,13 +31,12 @@ git clone https://github.com/SEU_USUARIO/alfredo-do-email.git
 cd alfredo-do-email
 Crie um ambiente virtual (recomendado):
 
-Bash
 python -m venv venv
 venv\Scripts\activate
 Instale as dependências:
 
 Bash
-pip install streamlit pandas pywin32 streamlit-quill
+pip install streamlit pandas pywin32 streamlit-quill streamlit-editorjs
 Execute a aplicação:
 
 Bash

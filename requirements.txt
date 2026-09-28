@@ -1,5 +1,8 @@
-﻿streamlit
+﻿streamlit-markdown
+streamlit
 pandas
 pywin32
 streamlit-quill
+streamlit-editorjs
 openpyxl
+
